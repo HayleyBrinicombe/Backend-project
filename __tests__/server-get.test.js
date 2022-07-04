@@ -17,6 +17,7 @@ describe("/api/categories", () => {
         .get("/api/categories")
         .expect(200)
         .then((res) => {
+          expect(res.body.categories).toHaveLength(4);
           res.body.categories.forEach((category) => {
             expect(category).toEqual(
               expect.objectContaining({
