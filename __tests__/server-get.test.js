@@ -40,3 +40,40 @@ describe("ERROR - /api/invalid_url", () => {
       });
   });
 });
+describe("GET/api/reviews/:review_id", () => {
+  test("Status 200, responds with the review for a specific review_id", () => {
+    return request(app)
+      .get("/api/reviews/1")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.review).toEqual({
+          review_id: 1,
+          title: "Agricola",
+          designer: "Uwe Rosenberg",
+          owner: "mallionaire",
+          review_body: "Farmyard fun!",
+          category: "euro game",
+          created_at: "2021-01-18T10:00:20.514Z",
+          votes: 1,
+          review_img_url:
+            "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
+        });
+      });
+  });
+  test("400, for an invalid review_id", () => {
+    return request(app)
+      .get("/api/reviews/invalid")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("bad request a review Id must be a number.");
+      });
+  });
+  test("404, for a valid but non-existent review_id", () => {
+    return request(app)
+      .get("/api/reviews/999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("review_id not found");
+      });
+  });
+});
