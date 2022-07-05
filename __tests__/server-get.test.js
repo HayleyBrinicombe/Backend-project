@@ -60,7 +60,7 @@ describe("GET/api/reviews/:review_id", () => {
         });
       });
   });
-  test.only("400, for an invalid review_id", () => {
+  test("400, for an invalid review_id", () => {
     return request(app)
       .get("/api/reviews/invalid")
       .expect(400)
@@ -68,7 +68,7 @@ describe("GET/api/reviews/:review_id", () => {
         expect(body.msg).toBe("bad request a review Id must be a number.");
       });
   });
-  test.only("404, for a valid but non-existent review_id", () => {
+  test("404, for a valid but non-existent review_id", () => {
     return request(app)
       .get("/api/reviews/999")
       .expect(404)
