@@ -10,70 +10,54 @@ beforeEach(() => {
 });
 afterAll(() => connection.end());
 
-describe("/api/categories", () => {
-  describe("GET", () => {
-    test("status 200, will return an array of categories", () => {
-      return request(app)
-        .get("/api/categories")
-        .expect(200)
-        .then((res) => {
-          expect(res.body.categories).toHaveLength(4);
-          res.body.categories.forEach((category) => {
-            expect(category).toEqual(
-              expect.objectContaining({
-                slug: expect.any(String),
-                description: expect.any(String)
-              })
-            );
-          });
-        });
-    });
-  });
-});
-describe("ERROR - /api/invalid_url", () => {
-  test("Status: 404 and returns and error message", () => {
+
+
+describe("PATCH /api/reviews/:review_id", () => {
+  test("200: patch updates vote count and returns updated review", () => {
     return request(app)
-      .get("/api/invalid_url")
-      .expect(404)
-      .then((res) => {
-        expect(res.body.msg).toBe("Not Found");
-      });
-  });
-});
-describe("GET/api/reviews/:review_id", () => {
-  test("Status 200, responds with the review for a specific review_id", () => {
-    return request(app)
-      .get("/api/reviews/1")
+      .patch("/api/reviews/1")
+      .send({ inc_votes: 2 })
       .expect(200)
-      .then(({ body }) => {
-        expect(body.review).toEqual({
+      .then((res) => {
+        expect(res.body.review).toEqual({
           review_id: 1,
           title: "Agricola",
           designer: "Uwe Rosenberg",
           owner: "mallionaire",
+          review_img_url:
+            "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
           review_body: "Farmyard fun!",
           category: "euro game",
-          created_at: "2021-01-18T10:00:20.514Z",
-          votes: 1,
-          review_img_url:
-            "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
+          created_at: expect.any(String),
+          votes: 3
         });
       });
   });
-  test("400, for an invalid review_id", () => {
+  test("404: returns when review_id does not exist", () => {
     return request(app)
-      .get("/api/reviews/invalid")
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("bad request a review Id must be a number.");
+      .patch("/api/reviews/118")
+      .send({ inc_votes: 2 })
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Unable to process request: Review ID 118 could not be found");
       });
   });
-  test("404, for a valid but non-existent review_id", () => {
+  test("400: returns when vote is not a number", () => {
     return request(app)
-      .get("/api/reviews/999")
+      .patch("/api/reviews/1")
+      .send({ inc_votes: "fish" })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Bad Request");
+      });
+  });
+  test("404: returns when misspelt endpoint ", () => {
+    return request(app)
+      .patch("/api/review/1")
+      .send({ inc_votes: 2 })
       .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("review_id not found");
+      .then((res) => {
+        expect(res.body.msg).toBe("Not Found");
       });
   });
 });
