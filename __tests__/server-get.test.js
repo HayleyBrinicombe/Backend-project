@@ -65,7 +65,7 @@ describe("GET/api/reviews/:review_id", () => {
       .get("/api/reviews/invalid")
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("bad request a review Id must be a number.");
+        expect(body.msg).toBe("Bad Request");
       });
   });
   test("404, for a valid but non-existent review_id", () => {
@@ -135,6 +135,34 @@ describe("PATCH /api/reviews/:review_id", () => {
       .expect(400)
       .then((res) => {
         expect(res.body.msg).toBe("Bad Request");
+      });
+  });
+});
+
+describe("/api/users", () => {
+  describe("GET", () => {
+    it("returns all users", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body: { users } }) => {
+          expect(users).toHaveLength(4);
+          users.forEach((user) => {
+            expect(user).toHaveProperty("username");
+            expect(user).toHaveProperty("name");
+            expect(user).toHaveProperty("avatar_url");
+          });
+        });
+    });
+  });
+});
+describe("ERROR - invalid path users api", () => {
+  test("Status: 404 and returns and error message", () => {
+    return request(app)
+      .get("/api/userz")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Not Found");
       });
   });
 });

@@ -36,3 +36,9 @@ exports.updateReviewById = (review_id, inc_votes) => {
       });
     });
 };
+
+exports.selectUsers = () => {
+  return connection.query("SELECT * FROM users;").then(({ rows }) => {
+    return rows;
+  });
+};
