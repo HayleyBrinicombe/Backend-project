@@ -2,7 +2,8 @@ const {
   selectCategories,
   selectReviewById,
   updateReviewById,
-  selectUsers
+  selectUsers,
+  selectReviews
 } = require("../models/games-models");
 
 exports.getCategories = (req, res, next) => {
@@ -38,7 +39,6 @@ exports.patchReviewById = (req, res, next) => {
     });
 };
 
-
 exports.getUsers = (req, res, next) => {
   selectUsers()
     .then((users) => {
@@ -48,5 +48,13 @@ exports.getUsers = (req, res, next) => {
       next(err);
     });
 };
-            
-
+exports.getReviews = (req, res, next) => {
+  selectReviews()
+    .then((reviews) => {
+      console.log(reviews)
+      res.status(200).send({ reviews: reviews });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
