@@ -57,7 +57,7 @@ describe("GET/api/reviews/:review_id", () => {
           votes: 1,
           review_img_url:
             "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
-          comment_count: "0"
+          comment_count: 0
         });
       });
   });
@@ -167,3 +167,4 @@ describe("ERROR - invalid path users api", () => {
       });
   });
 });
+

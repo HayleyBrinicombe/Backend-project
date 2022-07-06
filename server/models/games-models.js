@@ -8,7 +8,7 @@ exports.selectCategories = () => {
 exports.selectReviewById = (review_id) => {
   return connection
     .query(
-      `SELECT reviews.*, COUNT (comments.review_id) AS comment_count
+      `SELECT reviews.*, COUNT (comments.review_id)::INT AS comment_count
        FROM reviews
        LEFT JOIN comments
        ON reviews.review_id = comments.review_id
