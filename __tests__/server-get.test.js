@@ -10,8 +10,6 @@ beforeEach(() => {
 });
 afterAll(() => connection.end());
 
-
-
 describe("PATCH /api/reviews/:review_id", () => {
   test("200: patch updates vote count and returns updated review", () => {
     return request(app)
@@ -39,7 +37,9 @@ describe("PATCH /api/reviews/:review_id", () => {
       .send({ inc_votes: 2 })
       .expect(404)
       .then((res) => {
-        expect(res.body.msg).toBe("Unable to process request: Review ID 118 could not be found");
+        expect(res.body.msg).toBe(
+          "Unable to process request: Review ID 118 could not be found"
+        );
       });
   });
   test("400: returns when vote is not a number", () => {
@@ -58,6 +58,15 @@ describe("PATCH /api/reviews/:review_id", () => {
       .expect(404)
       .then((res) => {
         expect(res.body.msg).toBe("Not Found");
+      });
+  });
+  test("400: returns when spelt incorrectly", () => {
+    return request(app)
+      .patch("/api/reviews/1")
+      .send({ inc_botes: 2 })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Bad Request");
       });
   });
 });

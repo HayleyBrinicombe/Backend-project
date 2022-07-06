@@ -19,18 +19,20 @@ exports.selectReviewById = (review_id) => {
 exports.updateReviewById = (review_id, inc_votes) => {
   const query = [inc_votes, review_id];
   return connection
-  .query(`UPDATE reviews
+    .query(
+      `UPDATE reviews
   SET votes = votes + $1
   WHERE review_id = $2
-  RETURNING *`, 
-  query)
-.then(({ rows: [review] }) => {
-  if (review) {
-
-    return review;
-  }
-  return Promise.reject({status: 404,
-  msg: `Unable to process request: Review ID ${review_id} could not be found`})
-})
-
-}
+  RETURNING *`,
+      query
+    )
+    .then(({ rows: [review] }) => {
+      if (review) {
+        return review;
+      }
+      return Promise.reject({
+        status: 404,
+        msg: `Unable to process request: Review ID ${review_id} could not be found`
+      });
+    });
+};
