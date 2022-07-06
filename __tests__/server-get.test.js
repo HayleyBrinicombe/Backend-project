@@ -167,4 +167,42 @@ describe("ERROR - invalid path users api", () => {
       });
   });
 });
-
+describe("/api/reviews", () => {
+  describe("GET", () => {
+    test("Status: 200. Responds with an array of review objects", () => {
+      return request(app)
+        .get("/api/reviews")
+        .expect(200)
+        .then(({ body: { reviews } }) => {
+          expect(reviews).toHaveLength(13);
+          reviews.forEach((review) => {
+            expect(review).toEqual(
+              expect.objectContaining({
+                owner: expect.any(String),
+                title: expect.any(String),
+                review_id: expect.any(Number),
+                category: expect.any(String),
+                review_img_url: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                review_body: expect.any(String),
+                designer: expect.any(String),
+                comment_count: expect.any(Number),
+              })
+            );
+          });
+        });
+    });
+    test("Status: 200. Responds with an array of review objects sorted by review creation date descending by default", () => {
+      return request(app)
+        .get("/api/reviews")
+        .expect(200)
+        .then(({ body }) => {
+          const { reviews } = body;
+          expect(reviews).toBeSortedBy("created_at", {
+            descending: true
+          });
+        });
+    });
+  });
+});

@@ -1,4 +1,5 @@
 const connection = require("../../db/connection");
+const reviews = require("../../db/data/test-data/reviews");
 
 exports.selectCategories = () => {
   return connection.query("SELECT * FROM categories;").then(({ rows }) => {
@@ -49,4 +50,21 @@ exports.selectUsers = () => {
   return connection.query("SELECT * FROM users;").then(({ rows }) => {
     return rows;
   });
+};
+exports.selectReviews = () => {
+  return connection
+    .query(
+      `SELECT reviews.*, COUNT (comments.review_id)::INT AS comment_count
+       FROM reviews
+       LEFT JOIN comments
+       ON reviews.review_id = comments.review_id
+       GROUP BY reviews.review_id
+       ORDER BY created_at DESC`
+    )
+    .then((reviews) => {
+      return reviews.rows;
+    })
+    .catch((err) => {
+      return err;
+    });
 };
