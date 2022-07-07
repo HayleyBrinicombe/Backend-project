@@ -52,7 +52,6 @@ exports.getUsers = (req, res, next) => {
 exports.getReviews = (req, res, next) => {
   selectReviews()
     .then((reviews) => {
-      console.log(reviews);
       res.status(200).send({ reviews: reviews });
     })
     .catch((err) => {
