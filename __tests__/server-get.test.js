@@ -36,7 +36,7 @@ describe("ERROR - /api/invalid_url", () => {
       .get("/api/invalid_url")
       .expect(404)
       .then((res) => {
-        expect(res.body.msg).toBe("Not Found");
+        expect(res.body.msg).toBe("URL Not Found");
       });
   });
 });
@@ -126,7 +126,7 @@ describe("PATCH /api/reviews/:review_id", () => {
       .send({ inc_votes: 2 })
       .expect(404)
       .then((res) => {
-        expect(res.body.msg).toBe("Not Found");
+        expect(res.body.msg).toBe("URL Not Found");
       });
   });
   test("400: returns when spelt incorrectly", () => {
@@ -163,7 +163,7 @@ describe("ERROR - invalid path users api", () => {
       .get("/api/userz")
       .expect(404)
       .then((res) => {
-        expect(res.body.msg).toBe("Not Found");
+        expect(res.body.msg).toBe("URL Not Found");
       });
   });
 });
@@ -244,6 +244,66 @@ describe("GET/api/reviews/:review_id/comments", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Invalid input");
+      });
+  });
+});
+
+describe("/api/reviews/:review_id/comments POST tests", () => {
+  test("Status: 201, Test that a new comment is posted", () => {
+    const data = {
+      username: "philippaclaire9",
+      body: "This was an epic journey!"
+    };
+    return request(app)
+      .post("/api/reviews/2/comments")
+      .send(data)
+      .expect(202)
+      .then(({ body }) => {
+        body.newComment.forEach((comments) => {
+          expect(comments).toEqual({
+            comment_id: 7,
+            author: "philippaclaire9",
+            review_id: 2,
+            votes: 0,
+            created_at: expect.any(String),
+            body: "This was an epic journey!"
+          });
+        });
+      });
+  });
+  test("Status: 201, Posts comments with the correct properties", () => {
+    const data = {
+      username: "philippaclaire9",
+      body: "This was an epic journey!"
+    };
+    return request(app)
+      .post("/api/reviews/2/comments")
+      .send(data)
+      .expect(202)
+      .then(({ body }) => {
+        body.newComment.forEach((comments) => {
+          expect(comments).toEqual({
+            comment_id: 7,
+            author: "philippaclaire9",
+            review_id: 2,
+            votes: 0,
+            created_at: expect.any(String),
+            body: "This was an epic journey!"
+          });
+        });
+      });
+  });
+  test("status: 404, When the comments part of the query is entered incorrectly", () => {
+    const data = {
+      username: "philippaclaire9",
+      body: "This was an epic journey!"
+    };
+    return request(app)
+      .post("/api/reviews/2/Wrongcommentsquery")
+      .send(data)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("URL Not Found");
       });
   });
 });
