@@ -4,7 +4,8 @@ const {
   updateReviewById,
   selectUsers,
   selectReviews,
-  selectCommentsByReviewId
+  selectCommentsByReviewId,
+  postNewComment
 } = require("../models/games-models");
 
 exports.getCategories = (req, res, next) => {
@@ -66,5 +67,20 @@ exports.getCommentsByReviewId = (req, res, next) => {
     })
     .catch((error) => {
       next(error);
+    });
+};
+
+
+exports.postComment = (req, res, next) => {
+  const { username } = req.body;
+  const { body } = req.body;
+  const { review_id } = req.params;
+
+  postNewComment(review_id, username, body)
+    .then((newComment) => {
+      res.status(202).send({ newComment });
+    })
+    .catch((err) => {
+      next(err);
     });
 };

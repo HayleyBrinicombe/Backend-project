@@ -6,7 +6,8 @@ const {
   patchReviewById,
   getUsers,
   getReviews,
-  getCommentsByReviewId
+  getCommentsByReviewId,
+  postComment
 } = require("./controllers/games-controllers");
 
 const app = express();
@@ -22,8 +23,10 @@ app.get("/api/reviews/:review_id/comments", getCommentsByReviewId);
 app.patch("/api/reviews/:review_id", patchReviewById);
 
 
+app.post("/api/reviews/:review_id/comments", postComment);
+
 app.all("*", (req, res) => {
-  res.status(404).send({ msg: "Not Found" });                                 
+  res.status(404).send({ msg: "URL Not Found" });                                 
 });
 
 app.use((err, req, res, next) => {

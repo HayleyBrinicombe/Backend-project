@@ -1,4 +1,4 @@
-const { connect } = require("../../db/connection");
+const { Connection } = require("pg");
 const connection = require("../../db/connection");
 
 exports.selectCategories = () => {
@@ -93,7 +93,19 @@ exports.selectCommentsByReviewId = async (review_id) => {
      WHERE review_id = $1`,
     [review_id]
   );
-  
 
   return comments.rows;
+};
+exports.postNewComment = (review_id, username, body) => {
+  return connection
+    .query(
+      `INSERT INTO comments 
+  (author, review_id, body)
+  VALUES
+  ('${username}', ${review_id}, '${body}') 
+  RETURNING *;`
+    )
+    .then(({ rows }) => {
+      return rows;
+    });
 };
