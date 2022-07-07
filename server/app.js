@@ -22,21 +22,21 @@ app.get("/api/reviews/:review_id/comments", getCommentsByReviewId);
 
 app.patch("/api/reviews/:review_id", patchReviewById);
 
-
 app.post("/api/reviews/:review_id/comments", postComment);
 
 app.all("*", (req, res) => {
-  res.status(404).send({ msg: "URL Not Found" });                                 
+  res.status(404).send({ msg: "URL Not Found" });
 });
 
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
     res.status(400).send({ msg: "Bad Request" });
-  } else if ( err.code  ===  '23502') {
-    res.status(400).send({ msg: "Bad Request" })
-  } else {
-    next(err);
+  } else if (err.code === "23502") {
+    res.status(400).send({ msg: "Bad Request" });
+  } else if (err.code === "23503") {
+    res.status(400).send({ msg: "Bad Request" });
   }
+  next(err);
 });
 
 app.use((err, req, res, next) => {
@@ -48,10 +48,9 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  console.log(err)
-  
-  res.Status(500);
+  console.log(err);
 
+  res.Status(500);
 });
 
 module.exports = app;

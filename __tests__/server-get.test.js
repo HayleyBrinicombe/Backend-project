@@ -306,4 +306,13 @@ describe("/api/reviews/:review_id/comments POST tests", () => {
         expect(body.msg).toBe("URL Not Found");
       });
   });
+  it("Status 400: responds with invalid query body when length correct but username or body are not present", () => {
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send({ wrongColumn: 1, wrongColumn2: "Hello" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
 });
