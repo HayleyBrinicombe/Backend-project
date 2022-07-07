@@ -271,6 +271,28 @@ describe("/api/reviews/:review_id/comments POST tests", () => {
         });
       });
   });
+  test("Status: 201, Posts comments with the correct properties", () => {
+    const data = {
+      username: "philippaclaire9",
+      body: "This was an epic journey!"
+    };
+    return request(app)
+      .post("/api/reviews/2/comments")
+      .send(data)
+      .expect(202)
+      .then(({ body }) => {
+        body.newComment.forEach((comments) => {
+          expect(comments).toEqual({
+            comment_id: 7,
+            author: "philippaclaire9",
+            review_id: 2,
+            votes: 0,
+            created_at: expect.any(String),
+            body: "This was an epic journey!"
+          });
+        });
+      });
+  });
   test("status: 404, When the comments part of the query is entered incorrectly", () => {
     const data = {
       username: "philippaclaire9",
@@ -282,30 +304,6 @@ describe("/api/reviews/:review_id/comments POST tests", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("URL Not Found");
-      });
-  });
-  test("status: 400, invalid review_id format", () => {
-    return request(app)
-      .get("/api/reviews/this_is_not_an_id/comments")
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Invalid input");
-      });
-  });
-  test("status: 400, No such key, wrong key, wrong body", () => {
-    return request(app)
-      .get("/api/reviews/this_is_not_an_id/comments")
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Invalid input");
-      });
-  });
-  test("status: 400, No such key, wrong key, wrong userName", () => {
-    return request(app)
-      .get("/api/reviews/this_is_not_an_id/comments")
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Invalid input");
       });
   });
 });
