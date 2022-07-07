@@ -187,7 +187,7 @@ describe("/api/reviews", () => {
                 votes: expect.any(Number),
                 review_body: expect.any(String),
                 designer: expect.any(String),
-                comment_count: expect.any(Number),
+                comment_count: expect.any(Number)
               })
             );
           });
@@ -204,5 +204,46 @@ describe("/api/reviews", () => {
           });
         });
     });
+  });
+});
+
+describe("GET/api/reviews/:review_id/comments", () => {
+  test("status:200, returns an array of comments by their review_id", () => {
+    const reviewId = 2;
+    return request(app)
+      .get(`/api/reviews/${reviewId}/comments`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(3);
+        body.comments.forEach((comment) => {
+          expect(comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+              review_id: reviewId
+            })
+          );
+        });
+      });
+  });
+  test("status:404, returns an error if the review does not exist", () => {
+    const reviewId = 2000;
+    return request(app)
+      .get(`/api/reviews/${reviewId}/comments`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Resource not found");
+      });
+  });
+  test("status: 400, responds with 400 bad request when review_id is of invalid datatype", () => {
+    return request(app)
+      .get("/api/reviews/this_is_not_an_id/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
   });
 });

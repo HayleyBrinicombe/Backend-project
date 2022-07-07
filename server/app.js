@@ -5,7 +5,8 @@ const {
   getReviewById,
   patchReviewById,
   getUsers,
-  getReviews
+  getReviews,
+  getCommentsByReviewId
 } = require("./controllers/games-controllers");
 
 const app = express();
@@ -16,6 +17,7 @@ app.get("/api/categories", getCategories);
 app.get("/api/reviews/:review_id", getReviewById);
 app.get("/api/users", getUsers);
 app.get("/api/reviews", getReviews);
+app.get("/api/reviews/:review_id/comments", getCommentsByReviewId);
 
 app.patch("/api/reviews/:review_id", patchReviewById);
 
@@ -43,8 +45,10 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+  console.log(err)
   
-  res.sendStatus(500);
+  res.Status(500);
+
 });
 
 module.exports = app;
