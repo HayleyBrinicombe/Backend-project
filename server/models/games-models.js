@@ -51,22 +51,54 @@ exports.selectUsers = () => {
     return rows;
   });
 };
-exports.selectReviews = () => {
-  return connection
-    .query(
-      `SELECT reviews.*, COUNT (comments.review_id)::INT AS comment_count
+exports.selectReviews = (category, sort_by = "created_at", order = "DESC") => {
+  const validColumns = [
+    "owner",
+    "title",
+    "review_id",
+    "category",
+    "created_at",
+    "votes",
+    "comment_count"
+  ];
+  if (!validColumns.includes(sort_by)) {
+    return Promise.reject({ status: 400, msg: "Bad Request" });
+  }
+  if (!["ASC", "DESC"].includes(order.toUpperCase())) {
+    return Promise.reject({ status: 400, msg: "Bad Request" });
+  }
+
+  if (category) {
+    return connection
+      .query(
+        `SELECT reviews.*, COUNT (comments.review_id)::INT AS comment_count
        FROM reviews
        LEFT JOIN comments
-       ON reviews.review_id = comments.review_id
+       ON reviews.review_id = comments.review_id    
+       WHERE reviews.category = $1  
        GROUP BY reviews.review_id
-       ORDER BY created_at DESC`
-    )
-    .then((reviews) => {
-      return reviews.rows;
-    })
-    .catch((err) => {
-      return err;
-    });
+       ORDER BY ${sort_by} ${order}`,
+        [category]
+      )
+      .then((reviews) => {
+        return reviews.rows;
+      });
+  } else {
+    return connection
+      .query(
+        `SELECT reviews.*, COUNT (comments.review_id)::INT AS comment_count
+       FROM reviews
+       LEFT JOIN comments
+       ON reviews.review_id = comments.review_id      
+       GROUP BY reviews.review_id
+       ORDER BY ${sort_by} ${order}`
+      )
+      .then((reviews) => {
+        return reviews.rows;
+      });
+  }
+
+  
 };
 exports.selectCommentsByReviewId = async (review_id) => {
   if (isNaN(+review_id)) {

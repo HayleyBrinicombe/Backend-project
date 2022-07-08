@@ -51,14 +51,16 @@ exports.getUsers = (req, res, next) => {
     });
 };
 exports.getReviews = (req, res, next) => {
-  selectReviews()
+  const { category, sort_by, order } = req.query;
+  selectReviews(category, sort_by, order)
     .then((reviews) => {
-      res.status(200).send({ reviews: reviews });
+      res.status(200).send({ reviews });
     })
     .catch((err) => {
       next(err);
     });
 };
+
 exports.getCommentsByReviewId = (req, res, next) => {
   const { review_id } = req.params;
   selectCommentsByReviewId(review_id)
@@ -69,7 +71,6 @@ exports.getCommentsByReviewId = (req, res, next) => {
       next(error);
     });
 };
-
 
 exports.postComment = (req, res, next) => {
   const { username } = req.body;

@@ -140,7 +140,7 @@ describe("PATCH /api/reviews/:review_id", () => {
   });
 });
 
-describe("/api/users", () => {
+describe("GET/api/users", () => {
   describe("GET", () => {
     it("returns all users", () => {
       return request(app)
@@ -167,7 +167,8 @@ describe("ERROR - invalid path users api", () => {
       });
   });
 });
-describe("/api/reviews", () => {
+
+describe("GET/api/reviews", () => {
   describe("GET", () => {
     test("Status: 200. Responds with an array of review objects", () => {
       return request(app)
@@ -205,105 +206,172 @@ describe("/api/reviews", () => {
         });
     });
   });
-});
-
-describe("GET/api/reviews/:review_id/comments", () => {
-  test("status:200, returns an array of comments by their review_id", () => {
-    const reviewId = 2;
+  test("respond 200 and returns a sorted array of reviews by date ", () => {
     return request(app)
-      .get(`/api/reviews/${reviewId}/comments`)
+      .get("/api/reviews?sort_by=created_at")
       .expect(200)
-      .then(({ body }) => {
-        expect(body.comments.length).toBe(3);
-        body.comments.forEach((comment) => {
-          expect(comment).toEqual(
-            expect.objectContaining({
-              comment_id: expect.any(Number),
-              votes: expect.any(Number),
-              created_at: expect.any(String),
-              author: expect.any(String),
-              body: expect.any(String),
-              review_id: reviewId
-            })
-          );
+      .then((res) => {
+        expect(res.body.reviews).toBeSortedBy("created_at", {
+          descending: true
         });
       });
   });
-  test("status:404, returns an error if the review does not exist", () => {
-    const reviewId = 2000;
-    return request(app)
-      .get(`/api/reviews/${reviewId}/comments`)
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Resource not found");
-      });
-  });
-  test("status: 400, responds with 400 bad request when review_id is of invalid datatype", () => {
-    return request(app)
-      .get("/api/reviews/this_is_not_an_id/comments")
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Invalid input");
-      });
-  });
-});
+  describe("order query", () => {
+    it("Returns the list of reviews in ASC order", () => {
+      return request(app)
+        .get("/api/reviews?order=asc")
+        .expect(200)
+        .then((res) => {
+          expect(res.body.reviews).toBeSortedBy("created_at", {
+            ascending: true
+          });
+        });
+    });
 
-describe("/api/reviews/:review_id/comments POST tests", () => {
-  test("Status: 201, Test that a new comment is posted", () => {
-    const data = {
-      username: "philippaclaire9",
-      body: "This was an epic journey!"
-    };
-    return request(app)
-      .post("/api/reviews/2/comments")
-      .send(data)
-      .expect(202)
-      .then(({ body }) => {
-        body.newComment.forEach((comments) => {
-          expect(comments).toEqual({
-            comment_id: 7,
-            author: "philippaclaire9",
-            review_id: 2,
-            votes: 0,
-            created_at: expect.any(String),
-            body: "This was an epic journey!"
+    it("Returns the list of reviews in DESC order", () => {
+      return request(app)
+        .get("/api/reviews?order=desc")
+        .expect(200)
+        .then((res) => {
+          expect(res.body.reviews).toBeSortedBy("created_at", {
+            descending: true
           });
         });
-      });
-  });
-  test("Status: 201, Posts comments with the correct properties", () => {
-    const data = {
-      username: "philippaclaire9",
-      body: "This was an epic journey!"
-    };
-    return request(app)
-      .post("/api/reviews/2/comments")
-      .send(data)
-      .expect(202)
-      .then(({ body }) => {
-        body.newComment.forEach((comments) => {
-          expect(comments).toEqual({
-            comment_id: 7,
-            author: "philippaclaire9",
-            review_id: 2,
-            votes: 0,
-            created_at: expect.any(String),
-            body: "This was an epic journey!"
-          });
+    });
+
+    it("Returns an error if invalid order value is used", () => {
+      return request(app)
+        .get("/api/reviews?order=ugh")
+        .expect(400)
+        .then((res) => {
+          expect(res.body).toEqual({ msg: "Bad Request" });
         });
+    });
+     it("Returns an error if invalid sort by value value is used", () => {
+       return request(app)
+         .get("/api/reviews?sort_by=ugh")
+         .expect(400)
+         .then((res) => {
+           expect(res.body).toEqual({ msg: "Bad Request" });
+         });
+     });
+
+    describe("category query", () => {
+      it("Returns a filtered list based on category query", () => {
+        return request(app)
+          .get("/api/reviews?category=social%deduction")
+          .expect(200)
+          .then((res) => {
+            res.body.reviews.forEach((item) => {
+              expect(item).toEqual(
+                expect.objectContaining({
+                  category: "social deduction"
+                })
+              );
+            });
+          });
       });
-  });
-  test("status: 404, When the comments part of the query is entered incorrectly", () => {
-    const data = {
-      username: "philippaclaire9",
-      body: "This was an epic journey!"
-    };
-    return request(app)
-      .post("/api/reviews/2/Wrongcommentsquery")
-      .send(data)
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("URL Not Found");
+    });
+
+    describe("GET/api/reviews/:review_id/comments", () => {
+      test("status:200, returns an array of comments by their review_id", () => {
+        const reviewId = 2;
+        return request(app)
+          .get(`/api/reviews/${reviewId}/comments`)
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments.length).toBe(3);
+            body.comments.forEach((comment) => {
+              expect(comment).toEqual(
+                expect.objectContaining({
+                  comment_id: expect.any(Number),
+                  votes: expect.any(Number),
+                  created_at: expect.any(String),
+                  author: expect.any(String),
+                  body: expect.any(String),
+                  review_id: reviewId
+                })
+              );
+            });
+          });
       });
+      test("status:404, returns an error if the review does not exist", () => {
+        const reviewId = 2000;
+        return request(app)
+          .get(`/api/reviews/${reviewId}/comments`)
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Resource not found");
+          });
+      });
+      test("status: 400, responds with 400 bad request when review_id is of invalid datatype", () => {
+        return request(app)
+          .get("/api/reviews/this_is_not_an_id/comments")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Invalid input");
+          });
+      });
+    });
+
+    describe("/api/reviews/:review_id/comments POST tests", () => {
+      test("Status: 201, Test that a new comment is posted", () => {
+        const data = {
+          username: "philippaclaire9",
+          body: "This was an epic journey!"
+        };
+        return request(app)
+          .post("/api/reviews/2/comments")
+          .send(data)
+          .expect(202)
+          .then(({ body }) => {
+            body.newComment.forEach((comments) => {
+              expect(comments).toEqual({
+                comment_id: 7,
+                author: "philippaclaire9",
+                review_id: 2,
+                votes: 0,
+                created_at: expect.any(String),
+                body: "This was an epic journey!"
+              });
+            });
+          });
+      });
+      test("Status: 201, Posts comments with the correct properties", () => {
+        const data = {
+          username: "philippaclaire9",
+          body: "This was an epic journey!"
+        };
+        return request(app)
+          .post("/api/reviews/2/comments")
+          .send(data)
+          .expect(202)
+          .then(({ body }) => {
+            body.newComment.forEach((comments) => {
+              expect(comments).toEqual({
+                comment_id: 7,
+                author: "philippaclaire9",
+                review_id: 2,
+                votes: 0,
+                created_at: expect.any(String),
+                body: "This was an epic journey!"
+              });
+            });
+          });
+      });
+      test("status: 404, When the comments part of the query is entered incorrectly", () => {
+        const data = {
+          username: "philippaclaire9",
+          body: "This was an epic journey!"
+        };
+        return request(app)
+          .post("/api/reviews/2/Wrongcommentsquery")
+          .send(data)
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("URL Not Found");
+          });
+      });
+    });
   });
 });
