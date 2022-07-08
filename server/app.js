@@ -7,7 +7,8 @@ const {
   getUsers,
   getReviews,
   getCommentsByReviewId,
-  postComment
+  postComment,
+  deleteComment
 } = require("./controllers/games-controllers");
 
 const app = express();
@@ -22,6 +23,7 @@ app.get("/api/reviews/:review_id/comments", getCommentsByReviewId);
 
 app.patch("/api/reviews/:review_id", patchReviewById);
 
+app.delete("/api/comments/:comment_id", deleteComment);
 
 app.post("/api/reviews/:review_id/comments", postComment);
 

@@ -97,8 +97,6 @@ exports.selectReviews = (category, sort_by = "created_at", order = "DESC") => {
         return reviews.rows;
       });
   }
-
-  console.log(bbbbbbb)
 };
 exports.selectCommentsByReviewId = async (review_id) => {
   if (isNaN(+review_id)) {
@@ -140,4 +138,18 @@ exports.postNewComment = (review_id, username, body) => {
     .then(({ rows }) => {
       return rows;
     });
+};
+exports.removeComment = async (commentId) => {
+  const result = await connection.query(
+    "DELETE FROM comments WHERE comment_id = $1 RETURNING *;",
+    [commentId]
+  );
+  console.log(result.rows);
+  if (result.rows.length === 0) {
+    return Promise.reject({
+      status: 404,
+      msg: "URL Not Found"
+    });
+  }
+  return result.rows;
 };

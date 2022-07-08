@@ -247,14 +247,14 @@ describe("GET/api/reviews", () => {
           expect(res.body).toEqual({ msg: "Bad Request" });
         });
     });
-     it("Returns an error if invalid sort by value value is used", () => {
-       return request(app)
-         .get("/api/reviews?sort_by=ugh")
-         .expect(400)
-         .then((res) => {
-           expect(res.body).toEqual({ msg: "Bad Request" });
-         });
-     });
+    it("Returns an error if invalid sort by value value is used", () => {
+      return request(app)
+        .get("/api/reviews?sort_by=ugh")
+        .expect(400)
+        .then((res) => {
+          expect(res.body).toEqual({ msg: "Bad Request" });
+        });
+    });
 
     describe("category query", () => {
       it("Returns a filtered list based on category query", () => {
@@ -372,6 +372,28 @@ describe("GET/api/reviews", () => {
             expect(body.msg).toBe("URL Not Found");
           });
       });
+    });
+  });
+
+  describe("DELETE /api/comments/:comment_id", () => {
+    it("204: deletes comment from database", () => {
+      return request(app).delete("/api/comments/2").expect(204);
+    });
+    it("404: not found - ID does not exist", () => {
+      return request(app)
+        .delete("/api/comments/30")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body).toEqual({ msg: "URL Not Found" });
+        });
+    });
+    it("400: bad request - ID invalid", () => {
+      return request(app)
+        .delete("/api/comments/elephant")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({ msg: "Bad Request" });
+        });
     });
   });
 });
