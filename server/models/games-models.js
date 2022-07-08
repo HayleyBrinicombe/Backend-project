@@ -98,7 +98,7 @@ exports.selectReviews = (category, sort_by = "created_at", order = "DESC") => {
       });
   }
 
-  
+  console.log(bbbbbbb)
 };
 exports.selectCommentsByReviewId = async (review_id) => {
   if (isNaN(+review_id)) {
