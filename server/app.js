@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 
 const {
   getCategories,
@@ -12,6 +13,7 @@ const {
 } = require("./controllers/games-controllers");
 
 const app = express();
+app.use(cors());
 
 app.use(express.json());
 
@@ -28,14 +30,14 @@ app.delete("/api/comments/:comment_id", deleteComment);
 app.post("/api/reviews/:review_id/comments", postComment);
 
 app.all("*", (req, res) => {
-  res.status(404).send({ msg: "URL Not Found" });                                 
+  res.status(404).send({ msg: "URL Not Found" });
 });
 
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
     res.status(400).send({ msg: "Bad Request" });
-  } else if ( err.code  ===  '23502') {
-    res.status(400).send({ msg: "Bad Request" })
+  } else if (err.code === "23502") {
+    res.status(400).send({ msg: "Bad Request" });
   } else {
     next(err);
   }
@@ -50,10 +52,9 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  console.log(err)
-  
-  res.Status(500);
+  console.log(err);
 
+  res.Status(500);
 });
 
 module.exports = app;
