@@ -8,25 +8,93 @@
     "exampleResponse": {
       "categories": [
         {
-          "description": "Players attempt to uncover each other's hidden role",
-          "slug": "Social deduction"
+          "slug": "strategy",
+          "description": "Strategy-focused board games that prioritise limited-randomness"
         }
       ]
     }
   },
   "GET /api/reviews": {
     "description": "serves an array of all reviews",
-    "queries": ["category", "sort_by", "order"],
+    "queries": ["category", "sort_by", "order_by"],
     "exampleResponse": {
       "reviews": [
         {
-          "title": "One Night Ultimate Werewolf",
-          "designer": "Akihisa Okui",
-          "owner": "happyamy2016",
-          "review_img_url": "https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-          "category": "hidden-roles",
-          "created_at": 1610964101251,
-          "votes": 5
+          "review_id": 10,
+          "title": "Super Rhino Hero",
+          "review_body": "Consequat velit occaecat voluptate do. Dolor pariatur fugiat sint et proident ex do consequat est. Nisi minim laboris mollit cupidatat et adipisicing laborum do. Sint sit tempor officia pariatur duis ullamco labore ipsum nisi voluptate nulla eu veniam. Et do ad id dolore id cillum non non culpa. Cillum mollit dolor dolore excepteur aliquip. Cillum aliquip quis aute enim anim ex laborum officia. Aliqua magna elit reprehenderit Lorem elit non laboris irure qui aliquip ad proident. Qui enim mollit Lorem labore eiusmod",
+          "designer": "Gamey McGameface",
+          "review_img_url": "https://images.pexels.com/photos/278918/pexels-photo-278918.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+          "votes": 7,
+          "category": "dexterity",
+          "owner": "jessjelly",
+          "created_at": "2021-01-22T11:35:50.936Z",
+          "comment_count": "2"
+        }
+      ]
+    }
+  },
+  "GET /api/reviews/:review_id": {
+    "description": "serves a review with the specified review id",
+    "queries": [],
+    "exampleResponse": {
+      "reviewById": {
+        "review_id": 1,
+        "title": "Culture a Love of Agriculture With Agricola",
+        "review_body": "You could sum up Agricola with the simple phrase 'Farmyeard Fun' but the mechanics and game play add so much more than that. You'll find yourself torn between breeding pigs, or sowing crops. Its joyeous and rewarding and it makes you think of time spent outside, which is much harder to do these days!",
+        "designer": "Uwe Rosenberg",
+        "review_img_url": "https://images.pexels.com/photos/4917821/pexels-photo-4917821.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+        "votes": 1,
+        "category": "strategy",
+        "owner": "tickle122",
+        "created_at": "2021-01-18T10:00:20.514Z",
+        "comment_count": 3
+      }
+    }
+  },
+  "GET /api/reviews/:review_id/comments": {
+    "description": "serves all comments associated with the specified review id",
+    "queries": [],
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 4,
+          "author": "grumpy19",
+          "review_id": 2,
+          "votes": 9,
+          "created_at": "2021-03-27T14:15:31.110Z",
+          "body": "Ex id ipsum dolore non cillum anim sint duis nisi anim deserunt nisi minim."
+        }
+      ]
+    }
+  },
+  "PATCH /api/reviews/:review_id": {
+    "description": "updates a reviews votes to the specified review id and returns the updated review object",
+    "queries": [],
+    "ExampleJSONToSend": "{inc_votes: 10}",
+    "exampleResponse": {
+      "review": {
+        "title": "A truly Quacking Game; Quacks of Quedlinburg",
+        "designer": "Wolfgang Warsch",
+        "owner": "happyamy2016",
+        "review_body": "Ever wish you could try your hand at mixing potions? Quacks of Quedlinburg will have you mixing up a homebrew like no other. Each player buys different ingredients (chips) that are drawn at random to reach the most points, but watch out, you'd better not let your cauldrom explode.",
+        "category": "push-your-luck",
+        "created_at": "2021-01-18 10:01:41",
+        "votes": 20
+      }
+    }
+  },
+  "POST /api/reviews/:review_id/comments": {
+    "description": "posts a new comment to be associated with the specified review id, returns the newly created comment object",
+    "queries": [],
+    "exampleJSONTosend": "{validUsername: 'bainesface', body: 'Let's get it!'}",
+    "exampleResponse": {
+      "comments": [
+        {
+          "body": "Let's get it!",
+          "author": "bainesface",
+          "created_at": "2021-05-23 11:52:27",
+          "votes": 0
         }
       ]
     }
